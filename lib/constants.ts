@@ -6,6 +6,7 @@ export const CATEGORY_NAMES = [
   "Fuel",
   "Medical",
   "Shopping",
+  "Blinkit",
   "Utilities",
   "Education",
   "Travel",
@@ -52,6 +53,16 @@ export const CATEGORY_ALIASES: Record<string, CategoryName> = {
   clothes: "Shopping",
   clothing: "Shopping",
   apparel: "Shopping",
+
+  // Blinkit
+  blinkit: "Blinkit",
+  "quick commerce": "Blinkit",
+  "quick delivery": "Blinkit",
+  "instant delivery": "Blinkit",
+  "grocery delivery": "Blinkit",
+  zepto: "Blinkit",
+  instamart: "Blinkit",
+  swiggy: "Blinkit",
 
   // Utilities
   utilities: "Utilities",

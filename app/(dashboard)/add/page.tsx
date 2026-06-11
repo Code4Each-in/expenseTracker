@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useCategories } from "@/lib/hooks/use-categories";
+import { useProfile } from "@/lib/hooks/use-profile";
 import { QuickAddForm } from "@/components/expenses/quick-add-form";
 import { AIExpenseForm } from "@/components/expenses/ai-expense-form";
 import { Header } from "@/components/layout/header";
@@ -15,6 +16,9 @@ type Tab = "quick" | "ai";
 export default function AddExpensePage() {
   const [activeTab, setActiveTab] = useState<Tab>("quick");
   const { categories } = useCategories();
+  const { profile } = useProfile();
+
+  const isAdmin = profile?.role === "admin";
 
   // State that AI form populates into QuickAddForm
   const [prefilledCategoryId, setPrefilledCategoryId] = useState<string>("");
@@ -83,6 +87,7 @@ export default function AddExpensePage() {
                 prefilledCategoryId={prefilledCategoryId}
                 prefilledAmount={prefilledAmount}
                 prefilledDescription={prefilledDescription}
+                isAdmin={isAdmin}
               />
             </CardContent>
           </Card>

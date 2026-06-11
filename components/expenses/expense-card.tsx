@@ -2,7 +2,7 @@
 
 import { formatCurrency, formatDateShort } from "@/lib/utils";
 import type { ExpenseWithDetails } from "@/lib/types";
-import { Trash2 } from "lucide-react";
+import { Trash2, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -36,9 +36,14 @@ export function ExpenseCard({
 
       {/* Description + meta */}
       <div className="flex-1 min-w-0">
-        <p className="font-medium truncate text-sm">
-          {expense.description || expense.category_name}
-        </p>
+        <div className="flex items-center gap-1.5">
+          <p className="font-medium truncate text-sm">
+            {expense.description || expense.category_name}
+          </p>
+          {expense.is_private && (
+            <Lock className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+          )}
+        </div>
         <div className="flex items-center gap-1.5 mt-0.5">
           <span className="text-xs text-muted-foreground">
             {formatDateShort(expense.expense_date)}
@@ -54,7 +59,7 @@ export function ExpenseCard({
         </div>
       </div>
 
-      {/* Amount */}
+      {/* Amount + actions */}
       <div className="flex items-center gap-2 flex-shrink-0">
         <span className="font-bold text-base">
           {formatCurrency(expense.amount)}

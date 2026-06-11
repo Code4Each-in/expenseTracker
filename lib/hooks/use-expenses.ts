@@ -8,12 +8,14 @@ interface UseExpensesOptions {
   limit?: number;
   startDate?: string;
   endDate?: string;
+  userId?: string;
+  isPrivate?: boolean;
 }
 
 export function useExpenses(options: UseExpensesOptions = {}) {
   const [expenses, setExpenses] = useState<ExpenseWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
-  const { limit, startDate, endDate } = options;
+  const { limit, startDate, endDate, userId, isPrivate } = options;
   const supabase = createClient();
 
   const fetchExpenses = useCallback(async () => {
@@ -26,12 +28,14 @@ export function useExpenses(options: UseExpensesOptions = {}) {
 
     if (startDate) query = query.gte("expense_date", startDate);
     if (endDate) query = query.lte("expense_date", endDate);
+    if (userId) query = query.eq("created_by", userId);
+    if (isPrivate !== undefined) query = query.eq("is_private", isPrivate);
     if (limit) query = query.limit(limit);
 
     const { data } = await query;
     setExpenses(data ?? []);
     setLoading(false);
-  }, [supabase, limit, startDate, endDate]);
+  }, [supabase, limit, startDate, endDate, userId, isPrivate]);
 
   useEffect(() => {
     fetchExpenses();

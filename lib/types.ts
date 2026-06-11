@@ -26,6 +26,7 @@ export interface Expense {
   description: string | null;
   expense_date: string;
   receipt_url: string | null;
+  is_private: boolean;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -71,6 +72,7 @@ export interface ExpenseFormValues {
   category_id: string;
   description: string;
   expense_date: string;
+  is_private: boolean;
 }
 
 // Dashboard summary
