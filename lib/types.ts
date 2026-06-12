@@ -59,6 +59,24 @@ export interface MonthlyCategoryTotal {
   expense_count: number;
 }
 
+export interface MilkConfig {
+  id: string;
+  rate_per_liter: number;
+  effective_from: string;
+  created_by: string | null;
+  created_at: string;
+}
+
+export interface MilkEntry {
+  id: string;
+  entry_date: string;
+  quantity_liters: number;
+  notes: string | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
 // AI parsing result from Claude
 export interface ParsedExpense {
   amount: number;

@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getCurrentMonthRange, getCurrentMonthYear } from "@/lib/utils";
+import { getCurrentMonthRange, getCurrentMonthYear, formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 import { PlusCircle } from "lucide-react";
 import type { ExpenseWithDetails, MonthlyCategoryTotal } from "@/lib/types";
@@ -29,8 +29,10 @@ export default async function DashboardPage() {
   const { start, end } = getCurrentMonthRange();
   const { month, year } = getCurrentMonthYear();
 
+  const today = new Date().toISOString().split("T")[0];
+
   // Run queries in parallel
-  const [expensesResult, categoryTotalsResult, budgetResult] =
+  const [expensesResult, categoryTotalsResult, budgetResult, milkEntriesResult, milkRateResult] =
     await Promise.all([
       supabase
         .from("expenses_with_details")
@@ -53,6 +55,20 @@ export default async function DashboardPage() {
         .eq("month", month)
         .eq("year", year)
         .maybeSingle(),
+
+      supabase
+        .from("milk_entries")
+        .select("quantity_liters")
+        .gte("entry_date", start)
+        .lte("entry_date", end),
+
+      supabase
+        .from("milk_config")
+        .select("rate_per_liter")
+        .lte("effective_from", today)
+        .order("effective_from", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ]);
 
   const recentExpenses = (expensesResult.data as ExpenseWithDetails[]) ?? [];
@@ -60,6 +76,11 @@ export default async function DashboardPage() {
     categoryTotalsResult.data as MonthlyCategoryTotal[]
   ) ?? [];
   const budgetAmount = budgetResult.data?.budget_amount ?? null;
+
+  const milkEntries = (milkEntriesResult.data ?? []) as { quantity_liters: number }[];
+  const milkRate = milkRateResult.data?.rate_per_liter ?? 75;
+  const milkTotalLiters = milkEntries.reduce((s, e) => s + Number(e.quantity_liters), 0);
+  const milkTotalCost = milkTotalLiters * Number(milkRate);
 
   const totalSpent = categoryTotals.reduce(
     (sum, cat) => sum + Number(cat.total_amount),
@@ -84,6 +105,34 @@ export default async function DashboardPage() {
             Add Expense
           </Link>
         </Button>
+
+        {/* Milk widget */}
+        <Card>
+          <CardContent className="pt-4 pb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-base">🥛</span>
+                  <p className="text-sm font-semibold text-muted-foreground">
+                    Milk This Month
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl font-bold">
+                    {milkTotalLiters.toFixed(1)} L
+                  </span>
+                  <span className="text-muted-foreground">·</span>
+                  <span className="text-base font-semibold text-muted-foreground">
+                    {formatCurrency(milkTotalCost)}
+                  </span>
+                </div>
+              </div>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/milk">View</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Category breakdown */}
         {categoryTotals.length > 0 && (

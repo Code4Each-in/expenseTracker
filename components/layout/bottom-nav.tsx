@@ -8,13 +8,25 @@ import {
   Receipt,
   BarChart2,
   User,
+  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const navItems = [
+type NavItem =
+  | {
+      href: string;
+      label: string;
+      icon: LucideIcon;
+      primary?: boolean;
+      emoji?: never;
+    }
+  | { href: string; label: string; emoji: string; icon?: never; primary?: never };
+
+const navItems: NavItem[] = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/expenses", label: "History", icon: Receipt },
   { href: "/add", label: "Add", icon: PlusCircle, primary: true },
+  { href: "/milk", label: "Milk", emoji: "🥛" },
   { href: "/reports", label: "Reports", icon: BarChart2 },
   { href: "/profile", label: "Profile", icon: User },
 ];
@@ -24,29 +36,45 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border safe-area-pb">
-      <div className="flex items-center justify-around px-2 py-1 max-w-lg mx-auto">
-        {navItems.map(({ href, label, icon: Icon, primary }) => {
-          const isActive = pathname === href || pathname.startsWith(href + "/");
+      <div className="flex items-center justify-around px-1 py-1 max-w-lg mx-auto">
+        {navItems.map((item) => {
+          const isActive =
+            pathname === item.href || pathname.startsWith(item.href + "/");
 
-          if (primary) {
+          if ("emoji" in item && item.emoji) {
             return (
               <Link
-                key={href}
-                href={href}
-                className="flex flex-col items-center -mt-5"
+                key={item.href}
+                href={item.href}
+                className="flex flex-col items-center gap-0.5 py-2 px-2 min-w-0 flex-1"
               >
+                <span className="text-xl leading-none">{item.emoji}</span>
                 <span
                   className={cn(
-                    "flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-transform active:scale-95",
-                    isActive
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-primary text-primary-foreground"
+                    "text-[10px] font-medium transition-colors",
+                    isActive ? "text-primary" : "text-muted-foreground"
                   )}
                 >
-                  <Icon className="h-6 w-6" />
+                  {item.label}
                 </span>
-                <span className="mt-1 text-[10px] font-medium text-muted-foreground">
-                  {label}
+              </Link>
+            );
+          }
+
+          const Icon = item.icon!;
+
+          if (item.primary) {
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex flex-col items-center gap-0.5 py-1 px-2 flex-1"
+              >
+                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-md transition-transform active:scale-95">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <span className="text-[10px] font-medium text-primary">
+                  {item.label}
                 </span>
               </Link>
             );
@@ -54,9 +82,9 @@ export function BottomNav() {
 
           return (
             <Link
-              key={href}
-              href={href}
-              className="flex flex-col items-center gap-0.5 py-2 px-3 min-w-[3.5rem]"
+              key={item.href}
+              href={item.href}
+              className="flex flex-col items-center gap-0.5 py-2 px-2 min-w-0 flex-1"
             >
               <Icon
                 className={cn(
@@ -70,7 +98,7 @@ export function BottomNav() {
                   isActive ? "text-primary" : "text-muted-foreground"
                 )}
               >
-                {label}
+                {item.label}
               </span>
             </Link>
           );
